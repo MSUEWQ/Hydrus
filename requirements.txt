@@ -1,3 +1,4 @@
 pandas == 2.2.3
 numpy == 1.26.4
 rpy2 == 3.6.4
+phydrus == 0.2.0

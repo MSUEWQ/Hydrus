@@ -3,3 +3,4 @@ rpy2 == 3.6.4
 phydrus == 0.2.0
 matplotlib == 3.10.7
 numpy ==  2.3.5
+ipykernel == 7.1.0

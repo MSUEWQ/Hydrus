@@ -1,0 +1,10 @@
+ObsPoint,df.name,depth,pch,col,plot.yn
+1,obs_01_theta,2,1,blue,y
+2,obs_02_theta,6,1,blue,n
+3,obs_03_theta,11,1,blue,n
+4,obs_04_theta,21,1,blue,n
+5,obs_05_theta,31,5,black,n
+6,obs_06_theta,46,1,black,n
+7,obs_07_theta,71,1,blue,n
+8,obs_08_theta,91,1,black,n
+9,obs_09_theta,111,1,black,n

@@ -1,0 +1,12 @@
+ ******* Program HYDRUS
+ ******* 
+ None                                                                    
+ Date:  18.12.2025    Time:  14: 2:54
+ Units: L = cm   , T = days , M = mmol 
+
+
+
+                             Node( 11)                      Node( 51)                      Node( 91)                      Node(111)
+
+       time         h        theta    Temp         h        theta    Temp         h        theta    Temp         h        theta    Temp   
+end

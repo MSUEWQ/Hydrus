@@ -1,0 +1,12 @@
+ ******* Program HYDRUS
+ ******* 
+ None                                                                    
+ Date:  19.12.    Time:  14:16:34
+ Units: L = mm   , T = days , M = mmol 
+
+
+
+                               Node(  3)                      Node(  7)                      Node( 12)                      Node( 22)                      Node( 32)                      Node( 47)                      Node( 72)                      Node( 92)                      Node(112)
+
+         time            h        theta    Temp           h        theta    Temp           h        theta    Temp           h        theta    Temp           h        theta    Temp           h        theta    Temp           h        theta    Temp           h        theta    Temp           h        theta    Temp  
+end

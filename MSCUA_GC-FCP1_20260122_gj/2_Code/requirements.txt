@@ -1,0 +1,11 @@
+pandas == 2.3.3
+rpy2 == 3.6.4
+phydrus == 0.2.0
+matplotlib == 3.10.7
+numpy ==  2.3.5
+ipykernel == 7.1.0
+xarray == 2025.12.0
+spotpy == 1.6.6
+tqdm == 4.67.1
+scipy == 1.16.3
+dask == 2025.12.0

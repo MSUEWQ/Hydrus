@@ -87,7 +87,7 @@ def read_i_check(path="I_CHECK.OUT"):
         return data
 
 
-def read_tlevel(path="T_LEVEL.OUT", usecols=None):
+def read_tlevel_modified(path="T_LEVEL.OUT", usecols=None):
     """
     Method to read the T_LEVEL.OUT output file.
 

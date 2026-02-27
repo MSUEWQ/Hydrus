@@ -8,7 +8,7 @@ from pandas import DataFrame, DatetimeIndex, MultiIndex
 from os import path
 from pandas import read_csv, DataFrame
 
-from ReadFunction import read_profile, read_nod_inf, read_run_inf, read_tlevel_modified, \
+from ReadFunctions import read_profile, read_nod_inf, read_run_inf, read_tlevel_modified, \
     read_balance, read_i_check, read_obs_node, read_solute, read_alevel
 
 
@@ -1456,6 +1456,7 @@ class Model:
         data = read_i_check(path)
         return data
 
+    
     def read_tlevel_modified(self, fname="T_LEVEL.OUT", usecols=None):
         path = os.path.join(self.ws_name, fname)
 
@@ -1480,6 +1481,7 @@ class Model:
         data = read_tlevel_modified(path=path, usecols=usecols)
 
         return data
+    
 
     def read_alevel(self, fname="A_LEVEL.OUT", usecols=None):
         path = os.path.join(self.ws_name, fname)
@@ -1667,5 +1669,3 @@ Model.read_i_check.__doc__ = "{}".format(read_i_check.__doc__)
 Model.read_tlevel_modified.__doc__ = "{}".format(read_tlevel_modified.__doc__)
 Model.read_alevel.__doc__ = "{}".format(read_alevel.__doc__)
 Model.read_solutes.__doc__ = "{}".format(read_solute.__doc__)
-
-

@@ -1,0 +1,15 @@
+﻿scenario.name,ss.name,thetar,thetas,alpha,n,ksat,l,fieldcapacity
+ClayLoam,ClayLoa,0.0792,0.4418,0.0158,1.4145,8.18,0.5,0.277
+ClayLoamTr01,ClayLoamTr01,0.1,0.4418,0.0158,1.4145,8.18,0.5,0.277
+ClayLoamTr02,ClayLoamTr02,0.2,0.4418,0.0158,1.4145,8.18,0.5,0.277
+EvenValues,EvenValues,0.1,0.45,0.02,1.4,8,0.5,0.277
+EvenValuesFCtest,EvenValuesFCtest,0.1,0.45,0.02,1.4,8,0.5,0.4
+Gravel,Gravel,0.053,0.3747,0.353,3.1729,642.98,0.5,0.277
+SiltLoam,SiltLoam,0.0645,0.4387,0.0051,1.6626,18.26,0.5,0.277
+SandyClayLoam,SandyClayLoam,0.0633,0.3837,0.0211,1.3298,13.19,0.5,0.277
+GCP_FCP_LYS1,loam,0.0691,0.4234,0.0061,1.5783,14.6,0.5,0.277
+GCP_FCP_LYS2,loam,0.077,0.4365,0.0091,1.4895,11.86,0.5,0.277
+GCP_NP_LYS1,sandyloam,0.0677,0.4162,0.01,1.4872,9.22,0.5,0.277
+GCP_NP_LYS2,sandyloam,0.0468,0.387,0.0301,1.3912,32.78,0.5,0.277
+GCP_WP_LYS1,clayloam,0.0825,0.4445,0.0117,1.4211,9.09,0.5,0.277
+FCP1_inverse_infiltration,loam,1.00E-03,5.50E-01,5.00E-02,1.36E+00,1.00E+02,0.5,0.277

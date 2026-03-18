@@ -8,4 +8,5 @@ spotpy == 1.6.2
 tqdm == 4.66.2
 scipy == 1.15.3    
 dask == 2023.3.0 
+stopit == 1.1.2
 #phydrus == 0.2.0

@@ -1,0 +1,50 @@
+Pcp_File_Version=4
+*** BLOCK A: BASIC INFORMATION ***************************************************
+Created with Pydrus version 0.2.0
+None
+LUnit TUnit MUnit
+mm
+days
+mmol
+lWat  lChem  lTemp  lSink  lRoot  lShort  lWDep  lScreen  AtmInf  lEquil  lInverse  
+t  f  f  t  t  t  f  f  t  t  f
+lSnow  lHP1  lMeteo  lVapor  lActRSU  lFlux  lIrrig  
+f  f  f  f  f  f  f
+NMat NLay CosAlfa 
+4 1 1
+*** BLOCK B: WATER FLOW INFORMATION **********************************************
+MaxIt  TolTh  TolH   (maximum number of iterations and tolerances)
+10   0.001   1
+TopInf  WLayer  KodTop  lInitW  
+t f -1 f 
+BotInf  qGWLF  FreeD  SeepF  KodBot  qDrain  hSeep  
+f f t f -1 f 0 
+ha  hb  
+1e-06 10000.0 
+iModel  iHyst  
+0 0 
+   thr    ths   Alfa      n   Ks   l
+0.0792 0.4418 0.0158 1.4145 8.18 0.5
+0.0792 0.4418 0.0158 1.4145 8.18 0.5
+0.0792 0.4700 0.0300 1.3500 6.00 0.5
+0.0813 0.4231 0.0190 1.4500 8.00 0.5
+*** BLOCK C: TIME INFORMATION ****************************************************
+dt dtMin dtMax dMul dMul2 ItMin ItMax MPL 
+0.4 1e-05 0.5 1.3 0.7 3 7 1 
+tInit tMax 
+0 756 
+lPrintD nPrintSteps tPrintInterval lEnter 
+t 1 1 f 
+TPrint(1),TPrint(2),...,TPrint(MPL)
+756
+*** BLOCK D: ROOT GROWTH INFORMATION *********************************************
+iRootDepthEntry
+0
+*** BLOCK G: ROOT WATER UPTAKE INFORMATION ***************************************
+iMoSink cRootMax OmegaC 
+0    1    0.5
+P0 P2H P2L P3 r2H r2L 
+-1    -500    -900    -1600    0.5    0.1
+POptm(1),POptm(2),...,POptm(NMat)
+-1    -1    -1    -1
+*** BLOCK END OF INPUT FILE SELECTOR.IN ******************************************

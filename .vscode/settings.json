@@ -1,3 +1,4 @@
 {
-    "notebook.lineNumbers": "on"
+    "notebook.lineNumbers": "on",
+    "git.ignoreLimitWarning": true
 }

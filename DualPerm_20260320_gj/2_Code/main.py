@@ -12,10 +12,8 @@ import psutil
 def _worker(queue, vgs, calib, atm, atm_hydrus, obs, days, timesteps2, result_path):
     print("Worker started")
     try:
-        alldata, hydrus_output = rh.run_dual_perm(vgs, calib, atm, atm_hydrus, obs, days, timesteps2)
-        # Save results to temp files instead of passing through queue (avoids slow pickling)
+        hydrus_output = rh.run_dual_perm(vgs, calib, atm, atm_hydrus, obs, days, timesteps2)
         np.save(result_path + ".npy", hydrus_output)
-        alldata.to_pickle(result_path + "_alldata.pkl")
         print("Hydrus finished")
         queue.put("success")
     except Exception as e:
@@ -23,7 +21,7 @@ def _worker(queue, vgs, calib, atm, atm_hydrus, obs, days, timesteps2, result_pa
         queue.put(e)
 
 
-def run_with_timeout(vgs, calib, atm, atm_hydrus, obs, days, timesteps2, fallback, timeout=15):
+def run_with_timeout(vgs, calib, atm, atm_hydrus, obs, days, timesteps2, fallback, timeout=300):
     result_path = tempfile.NamedTemporaryFile(delete=False).name
     queue = mp.Queue()
     p = mp.Process(
@@ -44,7 +42,7 @@ def run_with_timeout(vgs, calib, atm, atm_hydrus, obs, days, timesteps2, fallbac
         except psutil.NoSuchProcess:
             pass
         p.join()
-        return (None, fallback)
+        return (fallback)
 
     print("Process finished, reading result from file")
     status = queue.get()
@@ -54,11 +52,11 @@ def run_with_timeout(vgs, calib, atm, atm_hydrus, obs, days, timesteps2, fallbac
 
     # Read results back from temp files
     hydrus_output = np.load(result_path + ".npy")
-    alldata = pd.read_pickle(result_path + "_alldata.pkl")
+    #alldata = pd.read_pickle(result_path + "_alldata.pkl")
 
     # Clean up temp files
     os.remove(result_path + ".npy")
-    os.remove(result_path + "_alldata.pkl")
+    #os.remove(result_path + "_alldata.pkl")
 
-    return alldata, hydrus_output
+    return hydrus_output
 

@@ -168,19 +168,19 @@ def run_dual_perm(vgs, calib, atm, atm_hydrus, obs, days, timesteps2):
         hydrus_output = hydrus_output.loc[hydrus_output.Date >= min(calib.Date)]
         hydrus_output = hydrus_output.drop(columns=["Date"])
 
-        #print("run complete")
+        print("run complete")
 
-        # If run returns static VWC values, replace all values with nan
+        # If run returns static VWC values, replace all values with 1s
         if len(np.unique(hydrus_output)) == 1:
-            hydrus_output = np.full((np.array(calib.drop(columns=["Date"])).shape), np.nan)
+            hydrus_output = np.full((np.array(calib.drop(columns=["Date"])).shape), 1.0)
 
-        return alldata, np.array(hydrus_output)
+        return np.array(hydrus_output)
 
 
     else: 
-        #print("Run failure")
-        #return array with same shape as observation data, filled with nan
-        return None, np.full((np.array(calib.drop(columns=["Date"])).shape), np.nan)
+        print("Run failure")
+        #return array with same shape as observation data, filled with 1s
+        return np.full((np.array(calib.drop(columns=["Date"])).shape), 1.0)
     
 
 
@@ -350,12 +350,12 @@ def run_single_por(vgs, calib, atm, atm_hydrus, obs, days, timesteps2):
 
         print("run complete")
 
-        # If run returns static VWC values, replace all values with nan
+        # If run returns static VWC values, replace all values with 1.0s
         if len(np.unique(hydrus_output)) == 1:
-            hydrus_output = np.full((np.array(calib.drop(columns=["Date"])).shape), np.nan)
-        return alldata, np.array(hydrus_output)
+            hydrus_output = np.full((np.array(calib.drop(columns=["Date"])).shape), 1.0)
+        return np.array(hydrus_output)
     
     else: 
         print("Run failure")
-        #return array with same shape as observation data, filled with nan
-        return None, np.full((np.array(calib.drop(columns=["Date"])).shape), np.nan)
+        #return array with same shape as observation data, filled with 1.0s
+        return np.full((np.array(calib.drop(columns=["Date"])).shape), 1.0)

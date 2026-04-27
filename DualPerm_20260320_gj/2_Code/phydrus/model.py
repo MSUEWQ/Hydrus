@@ -8,6 +8,7 @@ from logging import getLogger
 
 from numpy import arange, linspace
 from pandas import DataFrame, DatetimeIndex, MultiIndex
+from subprocess import Popen, PIPE
 
 from .plot import Plots
 from .read import read_profile, read_nod_inf, read_run_inf, read_tlevel, \
@@ -1007,17 +1008,18 @@ class Model:
             self.logger.info("Old 'Error.msg' file removed.")
             os.remove(os.path.join(self.ws_name, "Error.msg"))
 
-        # Run Hydrus executable.
+        # Run Hydrus executable, sending newline to handle any interactive prompts
         cmd = [self.exe_name, self.ws_name, "-1"]
-        result = run(cmd)
+        p = Popen(cmd, stdin=PIPE, stdout=PIPE, stderr=PIPE)
+        stdout, stderr = p.communicate(input=b'\n')
 
         # Provide the user with some feedback about the simulation
-        if result.returncode == 0:
+        if p.returncode == 0:
             self.logger.info("Hydrus-1D Simulation Successful.")
         else:
             self.logger.warning("Hydrus-1D Simulation Unsuccessful.")
 
-        return result
+        return p
 
     def write_input(self):
         """Method to write the input files for the HYDRUS-1D simulation."""

@@ -1,0 +1,3 @@
+﻿FieldDataColumn,Depth_cm,ModelType,ModelOutputColumn,FailValue
+VWC_6,83,dual_perm,theta84,1
+SWP,83,dual_perm,h84,10000

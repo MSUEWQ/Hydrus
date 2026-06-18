@@ -9,15 +9,17 @@ import psutil
 
 
 ### Define Functions ###
-def _worker(queue, vgs, depths, calib, atm, atm_hydrus, obs, days, timesteps2, calib_cols, settings, result_path):
+def _worker(queue, vgs, depths, calib, atm, atm_hydrus, obs, days, timesteps2, 
+            calib_cols, settings, trmin, trmax, xrmin, xrmax, result_path):
     print("Worker started")
     try:
         if settings.iloc[0,2] == "dual_perm":
-            hydrus_output = rh.run_dual_perm(vgs, depths, calib, atm, atm_hydrus, obs, days, timesteps2, calib_cols, settings)
+            hydrus_output = rh.run_dual_perm(vgs, depths, calib, atm, atm_hydrus, obs, days, timesteps2, 
+                                             calib_cols, settings, trmin, trmax, xrmin, xrmax)
         elif settings.iloc[0,2] == "single_por":
-            hydrus_output = rh.run_single_por(vgs, depths, calib, atm, atm_hydrus, obs, days, timesteps2, calib_cols, settings)
+            hydrus_output = rh.run_single_por(vgs, depths, calib, atm, atm_hydrus, obs, days, timesteps2, 
+                                              calib_cols, settings, trmin, trmax, xrmin, xrmax)
         np.save(result_path + ".npy", hydrus_output)
-        print(f"Saved array shape: {hydrus_output.shape}")
         print("Hydrus finished")
         queue.put("success")
     except Exception as e:
@@ -25,13 +27,15 @@ def _worker(queue, vgs, depths, calib, atm, atm_hydrus, obs, days, timesteps2, c
         queue.put(e)
 
 
-def run_with_timeout(vgs, depths, calib, atm, atm_hydrus, obs, days, timesteps2, calib_cols, settings, fallback, timeout=300):
+def run_with_timeout(vgs, depths, calib, atm, atm_hydrus, obs, days, timesteps2, 
+                     calib_cols, settings, trmin, trmax, xrmin, xrmax, fallback, timeout=300):
     result_path = tempfile.NamedTemporaryFile(delete=False).name
     queue = mp.Queue()
 
     p = mp.Process(
         target=_worker,
-        args=(queue, vgs, depths, calib, atm, atm_hydrus, obs, days, timesteps2, calib_cols, settings, result_path)
+        args=(queue, vgs, depths, calib, atm, atm_hydrus, obs, days, timesteps2, 
+              calib_cols, settings, trmin, trmax, xrmin, xrmax, result_path)
     )
     p.start()
     p.join(timeout)
@@ -50,7 +54,6 @@ def run_with_timeout(vgs, depths, calib, atm, atm_hydrus, obs, days, timesteps2,
         return (fallback)
 
     print("Process finished, reading result from file")
-    
 
     status = queue.get()
 
@@ -59,7 +62,6 @@ def run_with_timeout(vgs, depths, calib, atm, atm_hydrus, obs, days, timesteps2,
 
     # Read results back from temp files
     hydrus_output = np.load(result_path + ".npy")
-    print(f"Loaded array shape: {hydrus_output.shape}")
     
     #alldata = pd.read_pickle(result_path + "_alldata.pkl")
 

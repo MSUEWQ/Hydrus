@@ -28,7 +28,8 @@ class HydrusSetup(MscuaSetup):
     ka = spotpy.parameter.Uniform(low=0.00001, high=0.2)
 
 
-    def __init__(self, depths, calib, atm, atm_hydrus, obs, days, timesteps2, calib_cols, settings, params=None):
+    def __init__(self, depths, calib, atm, atm_hydrus, obs, days, timesteps2, 
+                 calib_cols, settings, trmin, trmax, xrmin, xrmax, params=None):
         super().__init__(objective_funcs=[nse_md])
 
         # store prepared inputs so simulation() can use them
@@ -41,6 +42,10 @@ class HydrusSetup(MscuaSetup):
         self.timesteps2 = timesteps2
         self.calib_cols = calib_cols
         self.settings = settings
+        self.trmin = trmin
+        self.trmax = trmax
+        self.xrmin = xrmin
+        self.xrmax = xrmax
         self.parameter_dimension = {            
             "thetar": 1, 
             "thetas": 1, 
@@ -117,7 +122,7 @@ class HydrusSetup(MscuaSetup):
                     row_array.insert(14, gamma)
                     params_array.append(list(row_array))
         
-        print(params_array)
+        #print(params_array)
 
         fallback = self.calib.copy().drop(columns=["Date"])
         for col, val in zip(self.settings["FieldDataColumn"], self.settings["FailValue"]):
@@ -127,10 +132,11 @@ class HydrusSetup(MscuaSetup):
         hydrus_output = run_with_timeout(
             params_array, self.depths, self.calib, self.atm, self.atm_hydrus, 
             self.obs, self.days, self.timesteps2, self.calib_cols, self.settings,
+            self.trmin, self.trmax, self.xrmin, self.xrmax,
             fallback=fallback,
             timeout=300
         )
-        print("simulation output shape:", hydrus_output.shape)
+        #print("simulation output shape:", hydrus_output.shape)
         return hydrus_output
 
     def evaluation(self):

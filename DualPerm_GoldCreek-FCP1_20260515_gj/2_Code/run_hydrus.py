@@ -5,7 +5,9 @@ import numpy as np
 import phydrus as ph 
 
 
-def run_dual_perm(vgs, depths, calib, atm, atm_hydrus, obs, days, timesteps2, calib_cols, settings, return_all = False):
+def run_dual_perm(vgs, depths, calib, atm, atm_hydrus, obs, days, timesteps2, 
+                  calib_cols, settings, trmin, trmax, xrmin, xrmax,
+                  return_all = False):
 
     #give path to exe file
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -95,12 +97,12 @@ def run_dual_perm(vgs, depths, calib, atm, atm_hydrus, obs, days, timesteps2, ca
         #make table of root data
         ml.add_root_growth(irootin= 2, #this has to be 2 for dual permeability
                         irfak= 0, #root growth is calculated from given data
-                        trmin= 1, #day when roots start growing
+                        trmin= trmin, #day when roots start growing
                         trmed= 150, #time of a specific root growth benchmark
-                        trmax= 365, #end of root growth period
-                        xrmin= 20, #root depth at start of growth period
-                        xrmed= 25, #root depth at trmed time
-                        xrmax= 30, #max rooting depth
+                        trmax= trmax, #end of root growth period
+                        xrmin= xrmin, #root depth at start of growth period
+                        xrmed= 45, #root depth at trmed time
+                        xrmax= xrmax, #max rooting depth
                         trperiod= 365 #number of days in root growth cycle
                         )
     

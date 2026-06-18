@@ -290,6 +290,13 @@ class MsCua:
             # need to convert simulation_results into an array here...sooner than it was
             sims_arr = np.array(dbase.simulation_results)
             ob = self.setup.objectivefunction(self.observation_data[None,:,:], sims_arr)
+
+            #print("sims_arr shape:", sims_arr.shape)
+            #print("observation_data shape:", self.observation_data.shape)
+            #for k, v in ob.items():
+            #    print(f"ob['{k}'] shape:", v.shape)
+            #print("refined_parameters['thetar'] shape:", dbase.refined_parameters['thetar'].shape)
+
             if not isinstance(ob, dict):
                 raise ValueError("The setup class's objective function method did not return a dictionary. " \
                 "A dictionary of objective functions is required.")
@@ -298,38 +305,27 @@ class MsCua:
             best_obfn = {}
             best_params = {}
             for k,v in ob.items():
+                if v.ndim == 2 and v.shape[1] > 1:
+                    # Multiple calibration columns: rank by the worst-performing column
+                    v_combined = np.min(v, axis=1) if obj_func_direction[k] == 'maximize' else np.max(v, axis=1)
+                else:
+                    v_combined = v.squeeze(axis=1) if v.ndim == 2 else v
+
                 if obj_func_direction[k] == 'minimize':
-                    best_rep = sims_arr[v.argmin(axis=0),:,np.arange(v.shape[1])].T
-                    best_ob = v[v.argmin(axis=0),np.arange(v.shape[1])]
+                    best_rep = sims_arr[v_combined.argmin(axis=0), :, :]
+                    best_ob = v_combined[v_combined.argmin(axis=0)]
                     best_par = {}
-                    for pk,pv in dbase.refined_parameters.items():
-                        best_par.update({pk: pv[v.argmin(axis=0), np.arange(v.shape[1])]})
+                    for pk, pv in dbase.refined_parameters.items():
+                        best_par.update({pk: pv[v_combined.argmin(axis=0)]})
                 elif obj_func_direction[k] == 'maximize':
-                    best_rep = sims_arr[v.argmax(axis=0),:,np.arange(v.shape[1])].T
-                    best_ob = v[v.argmax(axis=0),np.arange(v.shape[1])]
+                    best_rep = sims_arr[v_combined.argmax(axis=0), :, :]
+                    best_ob = v_combined[v_combined.argmax(axis=0)]
                     best_par = {}
-                    for pk,pv in dbase.refined_parameters.items():
-                        best_par.update({pk: pv[v.argmax(axis=0), np.arange(v.shape[1])]})
+                    for pk, pv in dbase.refined_parameters.items():
+                        best_par.update({pk: pv[v_combined.argmax(axis=0)]})
                 else:
                     raise ValueError("The objective function threshold direction is not recognized.")
-                '''
-                # v shape: (reps, n_cols)
-                # Collapse to scalar per rep by averaging across columns
-                v_mean = np.nanmean(v, axis=1)  # shape: (reps,)
-                
-                if obj_func_direction[k] == 'minimize':
-                    best_rep_idx = v_mean.argmin()
-                elif obj_func_direction[k] == 'maximize':
-                    best_rep_idx = v_mean.argmax()
-                else:
-                    raise ValueError("The objective function threshold direction is not recognized.")
-                
-                best_rep = sims_arr[best_rep_idx, :, :]        # shape: (timesteps, n_cols)
-                best_ob = v[best_rep_idx, :]                    # shape: (n_cols,)
-                best_par = {}
-                for pk, pv in dbase.refined_parameters.items():
-                    best_par.update({pk: pv[best_rep_idx]})     # scalar per parameter
-                '''
+
                 best_sim.update({k: best_rep})
                 best_obfn.update({k: best_ob})
                 best_params.update({k: best_par})
@@ -367,14 +363,18 @@ class MsCua:
                     for k, v in fil.items():
                         dbase._ref_par[park][v] = np.nan
                 '''
-            param_nans = np.isnan(dbase.refined_parameters[list(dbase.refined_parameters.keys())[0]])
+            
+            param_nans = np.isnan(dbase.refined_parameters[list(dbase.refined_parameters.keys())[0]]).squeeze(axis=1)
             refined_param_cnt = np.count_nonzero(~param_nans, axis=0)
             print(f"Max number of refined parameter sets: {refined_param_cnt.max()}")
             print(f"Min number of refined parameter sets: {refined_param_cnt.min()}")
             ref_less_than = np.count_nonzero(refined_param_cnt < min_refparams)
+            
             # Remove simulations from sim_arr that did not meet objective function thresholds
-            ref_sims_idx = np.where(param_nans)
-            sims_arr[ref_sims_idx[0],:,ref_sims_idx[1]] = np.nan
+            ref_sims_idx = np.where(param_nans)[0]  # 1D array of failed rep indices
+            sims_arr[ref_sims_idx, :, :] = np.nan   # mask ALL columns for failed reps
+            print(np.isnan(sims_arr).sum(axis=(1,2)))
+            
             ## calculate 95PPU here
             print("Calculating the 95PPU...")
             obs_sd = np.std(self.observation_data, axis=0)
@@ -417,7 +417,7 @@ class MsCua:
 
     def sample(self, reps: int, objfunc_thresholds: dict, min_pfactor: float = 0.35, min_refparams: int = 25, **kwargs):
         plist = build_parameter_list(self.setup, self.setup.parameter_dimension, self.setup.param_dim_names)
-        print("plist", plist)
+        #print("plist", plist)
         samples, newdb = LHS_md(plist, repetitions=reps, dbase=self.database, **kwargs)
         self.database = newdb
         run_multidim_model_reps(self.setup, self.database)
@@ -446,16 +446,6 @@ class MsCua:
             else:
                 raise ValueError("The objective function threshold direction is not recognized.")
             
-            '''
-            if k not in list(objfunc_thresh.keys()):
-                raise ValueError(f"No threshold was provided for objective function {k}.")
-            if obj_func_direction[k] == 'minimize':
-                filter = np.where(v > objfunc_thresh[k])
-            elif obj_func_direction[k] == 'maximize':
-                filter = np.where(v < objfunc_thresh[k])
-            else:
-                raise ValueError("The objective function threshold direction is not recognized.")
-            '''
             fil[k] = filter
         
         return ob, fil
@@ -886,12 +876,12 @@ class LocalSensitivityAnalysis:
         """Run one simulation and return NSE against observation."""
         sim = self.setup.simulation(params_dict)
         obs = self.setup.evaluation()
-        print(f"obs shape: {obs.shape}, sim shape: {sim.shape}")
+        #print(f"obs shape: {obs.shape}, sim shape: {sim.shape}")
         nse_result = self.setup.objectivefunction(
             obs[None, :, :],
             sim[None, :, :]
         )
-        return nse_result['nse']
+        return nse_result['nse'][0]
 
     def _get_param_bounds(self, param_name):
         """Retrieve low/high bounds from the spotpy parameter definition on the setup."""
@@ -943,25 +933,31 @@ class LocalSensitivityAnalysis:
         ncols = 3
         nrows = int(np.ceil(n / ncols))
 
-        fig, axes = plt.subplots(nrows, ncols, figsize=(5 * ncols, 4 * nrows))
-        axes = axes.flatten()
+        figs = []
 
-        for i, param_name in enumerate(params):
-            df = self.results[param_name]
-            axes[i].plot(df['param_value'], df['nse'], marker='o')
-            axes[i].set_title(param_name)
-            axes[i].set_xlabel('Parameter value')
-            axes[i].set_ylabel('NSE')
-            axes[i].axhline(y=self.base_params.get('nse_base', 0),
-                            color='gray', linestyle='--', linewidth=0.8)
+        for x in range(list(self.results.values())[1]["nse"][0].shape[0]):
+            fig, axes = plt.subplots(nrows, ncols, figsize=(5 * ncols, 4 * nrows))
+            axes = axes.flatten()
 
-        # Hide unused subplots
-        for j in range(i + 1, len(axes)):
-            axes[j].set_visible(False)
+            for i, param_name in enumerate(params):
+                df = self.results[param_name]
+                df1 = df.apply(lambda x: x["nse"], result_type="expand",axis=1)
+                axes[i].plot(df['param_value'], df1[x], marker='o')
+                axes[i].set_title(param_name)
+                axes[i].set_xlabel('Parameter value')
+                axes[i].set_ylabel('NSE')
+                axes[i].axhline(y=self.base_params.get('nse_base', 0),
+                                color='gray', linestyle='--', linewidth=0.8)
 
-        fig.suptitle('One-at-a-time sensitivity analysis', y=1.02)
-        fig.tight_layout()
-        return fig
+            # Hide unused subplots
+            for j in range(i + 1, len(axes)):
+                axes[j].set_visible(False)
+
+            fig.suptitle('One-at-a-time sensitivity analysis: Parameter ' + str(x+1), y=1.02)
+            fig.tight_layout()
+            figs.append(fig)
+        
+        return figs
 
     def save(self, path='sensitivity_results.csv'):
         """Save all parameter sweeps to a single CSV."""
